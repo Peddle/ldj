@@ -16,7 +16,7 @@ class Player extends Component {
   playerStyle(){
     return {
       position: "absolute",
-      backgroundColor: "red",
+      backgroundColor: "#F44",
       width: "100px",
       height: "100px",
       borderRadius: "100%",

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import './App.css';
 import {socket} from './Sockets.js';
 import Player from './Player.js';
+import Balance from './Balance.js';
 
 const linearLerp = (a, b, ratio) => {
   return a*(1-ratio) + b*ratio;
@@ -16,21 +17,52 @@ const playerLerp = (playerA, playerB, ratio) => {
   return Object.assign({}, playerB, {position});
 };
 
+const playersLerp = (playersA, playersB, ratio) => {
+  return playersB.map((nextPlayer, index) => {
+    if(index >= playersA.length)
+      return nextPlayer;
+    const previousPlayer = playersA[index];
+    return playerLerp(previousPlayer, nextPlayer, ratio);
+  });
+};
+
+const boardSizeLerp = (boardA, boardB, ratio) => {
+  return {
+    height: linearLerp(boardA.height, boardB.height, ratio),
+    width: linearLerp(boardA.width, boardB.width, ratio),
+  }
+};
+
+const emptyTickState = () => {
+  return {
+    players: [],
+    boardSize: {
+      height: 0,
+      width: 0,
+    },
+  };
+};
+
+const calculatePlayspaceOffset = () => {
+  const playSpace = document.getElementById('PlaySpace');
+  const styles = window.getComputedStyle(playSpace);
+
+  return {
+    x: parseFloat(styles.marginLeft),
+    y: parseFloat(styles.marginTop),
+  };
+}
+
 class App extends Component {
+
   constructor(props){
     super(props);
     this.state  = {
-      next: {
-        players: []
-      },
-      previous: {
-        players: []
-      },
+      next: emptyTickState(),
+      previous: emptyTickState(),
       startTimestamp: new Date().getTime(),
       endTimestamp: new Date().getTime() + 300,
-      lerped: {
-        players: []
-      },
+      lerped: emptyTickState(),
     };
 
     this.mousePos = {};
@@ -43,9 +75,9 @@ class App extends Component {
   }
 
   listenForTicks_(){
-    socket.on('tick', (players) => {
+    socket.on('tick', (tickState) => {
       const previous = this.state.next;
-      const next = players;
+      const next = tickState;
       const startTimestamp = new Date().getTime();
       const endTimestamp = new Date().getTime() + 300;
       const update = {previous, next, startTimestamp, endTimestamp};
@@ -64,14 +96,13 @@ class App extends Component {
 
       const previous = this.state.previous;
       const next = this.state.next;
-      const lerpedPlayers = next.players.map((nextPlayer, index) => {
-        if(index >= previous.players.length)
-          return nextPlayer;
-        const previousPlayer = previous.players[index];
-        return playerLerp(previousPlayer, nextPlayer, ratio);
-      });
+      const lerpedPlayers = playersLerp(
+        previous.players, next.players, ratio);
+      const lerpedBoardSize = boardSizeLerp(
+        previous.boardSize, next.boardSize, ratio);
       const lerped = Object.assign({}, next, {
-        players: lerpedPlayers
+        players: lerpedPlayers,
+        boardSize: lerpedBoardSize,
       });
       const newState = Object.assign(this.state, {lerped});
       this.setState(newState);
@@ -81,16 +112,20 @@ class App extends Component {
   startMousePoll_(){
     setInterval(() => {
 
+      const playSpaceOffset = calculatePlayspaceOffset();
       let center = {x: 250, y: 250};
       if(this.state.lerped.index !== undefined){
         center = 
           this.state.lerped.players[this.state.lerped.index].position; 
       }
+      center.x += playSpaceOffset.x;
+      center.y += playSpaceOffset.y;
+
+
       const moveVector = {};
       moveVector.x = this.mousePos.x - center.x;
       moveVector.y = this.mousePos.y - center.y;
 
-      console.log(moveVector);
       socket.emit('updateMoveVector', moveVector);
     }, 100);
   }
@@ -100,17 +135,43 @@ class App extends Component {
     this.mousePos.y = e.clientY;
   }
 
+  upgradeSpeed_(){
+    socket.emit('upgradeSpeed');
+  }
+
+  handleKeyPress_(e){
+    console.log(e.key);
+    switch(e.key) {
+      case 's':
+        this.upgradeSpeed_();
+        break;
+      default:
+        break;
+    }
+  }
+
   render() {
     const players = this.state.lerped.players
       .filter(player => player.alive)
       .map(player => {
       return (<Player position={player.position}/>);
     });
+    const playSize = {
+      height: this.state.lerped.boardSize.height,
+      width: this.state.lerped.boardSize.width,
+    };
     return (
         <div className="Game" 
+      tabIndex="0"
+      onKeyDown={(e) => {this.handleKeyPress_(e)}}
       onMouseMove={(e) => {this.updateMousePos_(e)}}>
+        <div id='PlaySpace' className="PlaySpace" style={ playSize }>
           {players}
         </div>
+        <Balance 
+            balance={this.state.lerped.balance} 
+            total={this.state.lerped.totalCurrency}/>
+      </div>
     );
   }
 }
