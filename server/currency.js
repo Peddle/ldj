@@ -30,6 +30,11 @@ const debitUpgrade = (index, lvl) => {
   }
   return false;
 }
+
+const transfer = (source, target) => {
+  balances[target] += balances[source];
+  balances[source] = 0;
+}
  
 
 module.exports = {
@@ -38,4 +43,5 @@ module.exports = {
   getTotalCurrency,
   deleteAccount,
   debitUpgrade,
+  transfer,
 }

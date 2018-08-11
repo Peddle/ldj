@@ -135,6 +135,10 @@ class App extends Component {
     this.mousePos.y = e.clientY;
   }
 
+  upgradeSize_(){
+    socket.emit('upgradeSize');
+  }
+  
   upgradeSpeed_(){
     socket.emit('upgradeSpeed');
   }
@@ -145,6 +149,9 @@ class App extends Component {
       case 's':
         this.upgradeSpeed_();
         break;
+      case 'd':
+        this.upgradeSize_();
+        break;
       default:
         break;
     }
@@ -154,7 +161,7 @@ class App extends Component {
     const players = this.state.lerped.players
       .filter(player => player.alive)
       .map(player => {
-      return (<Player position={player.position}/>);
+      return (<Player size={player.size} position={player.position}/>);
     });
     const playSize = {
       height: this.state.lerped.boardSize.height,

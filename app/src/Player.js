@@ -1,11 +1,6 @@
 import React, { Component } from 'react';
 
 class Player extends Component {
-  constructor(props) {
-    super(props);
-    props.position;
-  }
-
   render() {
     return (
       <div className="Player" style={this.playerStyle()}>
@@ -17,11 +12,11 @@ class Player extends Component {
     return {
       position: "absolute",
       backgroundColor: "#F44",
-      width: "100px",
-      height: "100px",
+      width: this.props.size,
+      height: this.props.size,
       borderRadius: "100%",
-      top: this.props.position.y - 50,
-      left: this.props.position.x - 50,
+      top: this.props.position.y - this.props.size*0.5,
+      left: this.props.position.x - this.props.size*0.5,
     };
   }
 }
