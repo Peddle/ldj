@@ -4,6 +4,8 @@ import {socket} from './Sockets.js';
 import Player from './Player.js';
 import Balance from './Balance.js';
 
+const TICK_PERIOD = 100;
+
 const linearLerp = (a, b, ratio) => {
   return a*(1-ratio) + b*ratio;
 };
@@ -61,7 +63,7 @@ class App extends Component {
       next: emptyTickState(),
       previous: emptyTickState(),
       startTimestamp: new Date().getTime(),
-      endTimestamp: new Date().getTime() + 300,
+      endTimestamp: new Date().getTime() + TICK_PERIOD,
       lerped: emptyTickState(),
     };
 
@@ -79,9 +81,10 @@ class App extends Component {
       const previous = this.state.next;
       const next = tickState;
       const startTimestamp = new Date().getTime();
-      const endTimestamp = new Date().getTime() + 300;
-      const update = {previous, next, startTimestamp, endTimestamp};
+      const endTimestamp = new Date().getTime() + TICK_PERIOD;
+      const update = {lerped: previous, previous, next, startTimestamp, endTimestamp};
       const newState = Object.assign(this.state, update);
+
       this.setState(newState);
     });
   }
@@ -118,6 +121,11 @@ class App extends Component {
         center = 
           this.state.lerped.players[this.state.lerped.index].position; 
       }
+      center = {
+        x: this.state.lerped.boardSize.width*0.5 + center.x,
+        y: this.state.lerped.boardSize.height*0.5 + center.y
+      }
+
       center.x += playSpaceOffset.x;
       center.y += playSpaceOffset.y;
 
@@ -158,10 +166,18 @@ class App extends Component {
   }
 
   render() {
+    const center = (pos) => {
+      return {
+        x: this.state.lerped.boardSize.width*0.5 + pos.x,
+        y: this.state.lerped.boardSize.height*0.5 + pos.y
+      };
+    };
     const players = this.state.lerped.players
       .filter(player => player.alive)
       .map(player => {
-      return (<Player size={player.size} position={player.position}/>);
+      return (<Player 
+        size={player.size} 
+        position={center(player.position)}/>);
     });
     const playSize = {
       height: this.state.lerped.boardSize.height,

@@ -68,6 +68,7 @@ const newGame = () => {
 //send tick
 setInterval(() => {
   const totalCurrency = Currency.getTotalCurrency();
+  Board.tick();
   const boardSize = {height: Board.height, width: Board.width};
 
   let playerCount = 0;

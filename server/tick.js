@@ -1,4 +1,4 @@
-const TICK_PERIOD = 300;
+const TICK_PERIOD = 100;
 
 module.exports = {
   TICK_PERIOD
