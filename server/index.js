@@ -9,6 +9,7 @@ io.listen(3001)
 const playerStructs = []
 const players = [];
 const sockets = [];
+const minPlayers = 5;
 
 //Player state update
 const game = io.on('connection', (socket) => {
@@ -57,13 +58,45 @@ const checkForCollision = (i, j) => {
   }
 };
 
+makeBot = () => {
+  var mockSocket = {}
+  mockSocket.connected = true;
+  mockSocket.emit = function(a, b) {};
+
+  const playerStruct = {};
+  const index = players.length;
+  const player = new Player(playerStruct, index);
+
+  playerStructs.push(playerStruct);
+  players.push(player);
+  sockets.push(mockSocket);
+
+  setInterval(function() {
+    players[index].setMoveVector({x:Math.random()*2 - 1, y:Math.random()*2 - 1})
+    let lottery = Math.random();
+    lottery > 0.95 ? players[index].upgradeSpeed() : null;
+    lottery < 0.05 ? players[index].upgradeSize() : null
+  }, 300);
+}
+
 const newGame = () => {
   Board.init();
+  let playerCount = 0;
   for(let i = 0; i < players.length; i++){
-    if(!sockets[i].connected) continue;
+    if(!sockets[i].connected) {
+      continue;
+    } else {
+      playerCount++;
+    }
     players[i] = new Player(playerStructs[i], i);
   }
+
+  for(let i = playerCount; i < minPlayers; i++) {
+    makeBot();
+  }
 }
+
+
 
 //send tick
 setInterval(() => {
