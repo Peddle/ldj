@@ -123,8 +123,8 @@ class App extends Component {
 
 
       const moveVector = {};
-      moveVector.x = this.mousePos.x - center.x;
-      moveVector.y = this.mousePos.y - center.y;
+      moveVector.x = (this.mousePos.x - center.x).toFixed(4);
+      moveVector.y = (this.mousePos.y - center.y).toFixed(4);
 
       socket.emit('updateMoveVector', moveVector);
     }, 100);

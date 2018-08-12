@@ -12,7 +12,8 @@ const bound = (val, lo, hi) => {
 class Player {
   constructor(playerStruct, id){
     this.playerStruct_ = playerStruct;
-    this.playerStruct_.position = {x: Math.random()*500, y: Math.random()*500};
+    this.playerStruct_.position = 
+      {x: Math.random()*Board.width, y: Math.random()*Board.height};
     this.playerStruct_.alive = true;
     this.playerStruct_.size = BASE_SIZE;
     this.id_ = id;

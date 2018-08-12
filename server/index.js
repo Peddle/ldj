@@ -21,19 +21,19 @@ const game = io.on('connection', (socket) => {
   sockets.push(socket);
 
   socket.on('disconnect', () => {
-    player.kill();
+    players[index].kill();
   });
 
   socket.on('updateMoveVector', (v) => {
-    player.setMoveVector(v);
+    players[index].setMoveVector(v);
   });
 
   socket.on('upgradeSize', () => {
-    player.upgradeSize();
+    players[index].upgradeSize();
   });
 
   socket.on('upgradeSpeed', () => {
-    player.upgradeSpeed();
+    players[index].upgradeSpeed();
   });
 });
 
@@ -49,7 +49,7 @@ const checkForCollision = (i, j) => {
   const distance = calculateDistance(p1.position, p2.position);
   const touchingDistance = p1.size*0.5 + p2.size*0.5;
 
-  if(distance <= touchingDistance*0.6 &&  Math.abs(p1.size - p2.size)> 2){
+  if(distance <= touchingDistance&&  Math.abs(p1.size - p2.size)> 2){
     const bigger = p1.size > p2.size ? players[i] : players[j];
     const smaller = p1.size < p2.size ? players[i] : players[j];
 
@@ -57,11 +57,20 @@ const checkForCollision = (i, j) => {
   }
 };
 
+const newGame = () => {
+  Board.init();
+  for(let i = 0; i < players.length; i++){
+    if(!sockets[i].connected) continue;
+    players[i] = new Player(playerStructs[i], i);
+  }
+}
+
 //send tick
 setInterval(() => {
   const totalCurrency = Currency.getTotalCurrency();
   const boardSize = {height: Board.height, width: Board.width};
 
+  let playerCount = 0;
   for(let i=0; i<sockets.length; i++){
     //tick sockets
     players[i].tickMove();
@@ -69,9 +78,26 @@ setInterval(() => {
     sockets[i].emit('tick', 
       {players: playerStructs, index: i, boardSize, balance, totalCurrency});
 
+    if(playerStructs[i].alive){
+      playerCount++;
+    }
+    else{
+      //don't need to do anything with dead players
+      continue;
+    }
+
     for(let j=i+1; j< sockets.length; j++){
+      if(!playerStructs[j].alive){
+        //don't need to do anything with dead players
+        continue;
+      }
+
       checkForCollision(i, j);
     }
+  }
+
+  if(playerCount <= 1){
+    newGame();
   }
 
 }, TICK_PERIOD);
