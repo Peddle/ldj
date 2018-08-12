@@ -4,7 +4,12 @@ const START_SIZE = 1000
 const board = {
   height: START_SIZE,
   width: START_SIZE,
-}
+};
+
+board.init = () => {
+  board.height = START_SIZE;
+  board.width = START_SIZE;
+};
 
 //Shrink game board
 setInterval(() => {

@@ -4,6 +4,7 @@ const BASE_PERCENT = 0.01;
 const balances = {};
 
 const initAccount = (id) => {
+  if(balances[id]) totalCurrency -= balances[id];
   balances[id] = STARTING_CURRENCY;
   totalCurrency += STARTING_CURRENCY;
 };
