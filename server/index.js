@@ -35,6 +35,10 @@ const game = io.on('connection', (socket) => {
   socket.on('upgradeSpeed', () => {
     players[index].upgradeSpeed();
   });
+
+  socket.on('nickname', (nickname) => {
+    players[index].setNickname(nickname);
+  });
 });
 
 const calculateDistance = (pos1, pos2) => {

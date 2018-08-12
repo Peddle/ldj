@@ -65,6 +65,7 @@ class App extends Component {
       startTimestamp: new Date().getTime(),
       endTimestamp: new Date().getTime() + TICK_PERIOD,
       lerped: emptyTickState(),
+      showInstructions: true,
     };
 
     this.mousePos = {};
@@ -74,6 +75,11 @@ class App extends Component {
     this.startLerp_();
     this.listenForTicks_();
     this.startMousePoll_();
+    if(props.nickname) this.sendNickname_(props.nickname);
+  }
+
+  sendNickname_(nickname){
+    socket.emit('nickname', nickname);
   }
 
   listenForTicks_(){
@@ -152,7 +158,6 @@ class App extends Component {
   }
 
   handleKeyPress_(e){
-    console.log(e.key);
     switch(e.key) {
       case 's':
         this.upgradeSpeed_();
@@ -165,6 +170,12 @@ class App extends Component {
     }
   }
 
+  hideInstructions(){
+    const newState = Object.assign({}, this.state);
+    newState.showInstructions = false;
+    this.setState(newState);
+  }
+
   render() {
     const center = (pos) => {
       return {
@@ -173,27 +184,54 @@ class App extends Component {
       };
     };
     const players = this.state.lerped.players
-      .filter(player => player.alive)
-      .map(player => {
-      return (<Player 
-        size={player.size} 
-        position={center(player.position)}/>);
-    });
+      .map((player, i) => {
+        if(!player.alive) return false;
+        const isYou = i === this.state.lerped.index;
+        return (<Player 
+          size={player.size} 
+          key={i}
+          index={i}
+          isYou={isYou}
+          nickname={player.nickname}
+          position={center(player.position)}/>);
+      });
     const playSize = {
       height: this.state.lerped.boardSize.height,
       width: this.state.lerped.boardSize.width,
     };
+    const maybeInstructions = this.state.showInstructions ? 
+      (<div class="Instructions">
+          <div 
+            class="close" 
+            onClick={() => {this.hideInstructions()}}>[ x ]</div>
+          <h3>How to play:</h3>
+            <h4>Objective</h4>
+              <p>Be the last one standing by eating your opponents and stealing their power</p>
+              <p>You Can only eat opponents who are smaller than you</p>
+            <h4>Controls</h4>
+            <ul>
+              <li>Use mouse to move</li>
+              <li>"S" key buy a speed upgrade with power </li>
+              <li>"D" key buy a size upgrade with power </li>
+            </ul>
+            <h4>Tip!</h4>
+            <p>
+              Upgrades cost a percentage of total power in the game. Wait for other players to spend their money to increase you purchasing power
+            </p>
+      </div>) : false;
+
     return (
-        <div className="Game" 
-      tabIndex="0"
-      onKeyDown={(e) => {this.handleKeyPress_(e)}}
-      onMouseMove={(e) => {this.updateMousePos_(e)}}>
+      <div className="Game" 
+          tabIndex="0"
+          onKeyDown={(e) => {this.handleKeyPress_(e)}}
+          onMouseMove={(e) => {this.updateMousePos_(e)}}>
         <div id='PlaySpace' className="PlaySpace" style={ playSize }>
           {players}
+          <Balance 
+              balance={this.state.lerped.balance} 
+              total={this.state.lerped.totalCurrency}/>
         </div>
-        <Balance 
-            balance={this.state.lerped.balance} 
-            total={this.state.lerped.totalCurrency}/>
+        {maybeInstructions}
       </div>
     );
   }

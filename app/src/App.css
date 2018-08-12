@@ -5,6 +5,28 @@
   background-color: #333;
 }
 
+.Instructions {
+  text-align: left;
+  font-size: 15px;
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  width: 400px;
+}
+
+.Instructions h4 {
+  text-align: center;
+}
+.Instructions h3 {
+  text-align: center;
+}
+.Instructions .close {
+  position: absolute;
+  right: 20px;
+  top: 10px;
+  cursor: pointer;
+}
+
 
 .PlaySpace {
   position: absolute;
@@ -18,7 +40,7 @@
 
 .Balance {
   position: absolute;
-  bottom: 10px;
+  bottom: -50px;
   text-align: center;
   width: 100%;
   color: #DDD;

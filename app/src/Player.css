@@ -1,7 +1,4 @@
-.Player {
-  position: absolute;
-  background-color: red;
-  width: 100px;
-  height: 100px;
-  border-radius: 100%;
+.YourPlayer div{
+  color: #8F8;
+  font-weight: bolder;
 }

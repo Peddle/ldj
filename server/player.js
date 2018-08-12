@@ -3,7 +3,7 @@ const Board = require('./board.js');
 
 const BASE_SPEED = 4;
 const SPEED_SCALAR = 1;
-const SIZE_SCALAR = 5;
+const SIZE_SCALAR = 8;
 const BASE_SIZE = 20;
 
 const bound = (val, lo, hi) => {
@@ -46,7 +46,6 @@ class Player {
 
   setMoveVector(v){
     const magnitude = Math.sqrt(v.x*v.x + v.y*v.y);
-    console.log(magnitude);
     const radius = this.playerStruct_.size*0.5;
 
     if(magnitude > radius*0.2){
@@ -78,6 +77,10 @@ class Player {
   eat(target){
     Currency.transfer(target.id_, this.id_);
     target.kill();
+  }
+
+  setNickname(nickname){
+    this.playerStruct_.nickname = nickname;
   }
 }
 

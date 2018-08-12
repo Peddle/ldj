@@ -23,7 +23,8 @@ const deleteAccount = (id) => {
 };
 
 const debitUpgrade = (index, lvl) => {
-  cost = Math.floor(lvl*BASE_PERCENT*totalCurrency) + 1;
+  // cost = Math.floor(lvl*BASE_PERCENT*totalCurrency) + 1;
+  cost = lvl*BASE_PERCENT*totalCurrency;
   if(balances[index] > cost){
     balances[index] -= cost;
     totalCurrency -= cost;
