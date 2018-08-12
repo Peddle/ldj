@@ -1,7 +1,7 @@
-# LDJ - Mycrocoin Smoke Test
+# LDJ - mycrocoin Smoke Test
 
 The theme of the jam is 'Running Out Of Space' so we are making
-a Battle Royale game with a resource/currency management aspect.
+a Battle Royale game with resource/currency management aspects.
 
 ### Developers
 
@@ -40,8 +40,8 @@ alternative server you can make a change in the `Socket.js` file.
 All of the backend code will be housed here, this is where most
 of the game logic will be.
 
-To get this set up, first you'll have to install nodemod by executing
-`npm install -g nodemod`. Then navigate to `ldj/server` and execute
+To get this set up, first you'll have to install nodemon by executing
+`npm install -g nodemon`. Then navigate to `ldj/server` and execute
 `npm install`. After that has completed enter `npm start` from the
 same directory. This will start up a server at `localhost:3001` but
 our client is pointing to the development server. You will need to
