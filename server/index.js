@@ -9,7 +9,7 @@ io.listen(3001)
 const playerStructs = []
 const players = [];
 const sockets = [];
-const minPlayers = 5;
+const minPlayers = 15;
 
 //Player state update
 const game = io.on('connection', (socket) => {
@@ -67,7 +67,7 @@ makeBot = () => {
   mockSocket.connected = true;
   mockSocket.emit = function(a, b) {};
 
-  const playerStruct = {};
+  const playerStruct = {nickname: "bot"};
   const index = players.length;
   const player = new Player(playerStruct, index);
 
@@ -75,15 +75,21 @@ makeBot = () => {
   players.push(player);
   sockets.push(mockSocket);
 
-  setInterval(function() {
-    players[index].setMoveVector({x:Math.random()*2 - 1, y:Math.random()*2 - 1})
+  setInterval(() => {
     let lottery = Math.random();
     lottery > 0.95 ? players[index].upgradeSpeed() : null;
     lottery < 0.05 ? players[index].upgradeSize() : null
   }, 300);
+  setInterval(() => {
+    const mag = 100;
+    players[index].setMoveVector({x:Math.random()*2*mag - mag,
+      y:Math.random()*2*mag - mag})
+  }, Math.random()* 2000);
 }
 
+let queueNewGame = false;
 const newGame = () => {
+  queueNewGame = false;
   Board.init();
   let playerCount = 0;
   for(let i = 0; i < players.length; i++){
@@ -109,6 +115,7 @@ setInterval(() => {
   const boardSize = {height: Board.height, width: Board.width};
 
   let playerCount = 0;
+  let lastMan;
   for(let i=0; i<sockets.length; i++){
     //tick sockets
     players[i].tickMove();
@@ -118,6 +125,7 @@ setInterval(() => {
 
     if(playerStructs[i].alive){
       playerCount++;
+      lastMan = playerStructs[i].nickname || "anonymous";
     }
     else{
       //don't need to do anything with dead players
@@ -134,8 +142,10 @@ setInterval(() => {
     }
   }
 
-  if(playerCount <= 1){
-    newGame();
+  if(playerCount <= 1 && !queueNewGame){
+    setTimeout(newGame,2000);
+    io.emit('winner', lastMan);
+    queueNewGame = true;
   }
 
 }, TICK_PERIOD);

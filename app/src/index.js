@@ -6,7 +6,7 @@ import registerServiceWorker from './registerServiceWorker';
 
 
 const Home = (props) => (
-  <div>
+  <div className="Home">
     <input 
       onChange={props.onNicknameChange} 
       placeholder="Enter Nickname"/>
@@ -19,7 +19,7 @@ class Routes extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      menu: false,
+      menu: true,
       nickname: "",
     };
   }

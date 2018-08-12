@@ -27,6 +27,14 @@
   cursor: pointer;
 }
 
+.Winner {
+  padding-top: 50px;
+}
+
+.Winner span {
+  color: #FA8;
+  font-weight: bolder;
+}
 
 .PlaySpace {
   position: absolute;

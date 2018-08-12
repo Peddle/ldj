@@ -5,7 +5,12 @@ import perlin from 'perlin-noise';
 const colors = [
   [255, 68, 68],
   [102, 204, 255],
+  [70, 255, 180],
+  [255, 100, 200],
+  [255, 204, 173],
+  [225, 173, 255],
 ];
+
 
 const flicker = perlin.generatePerlinNoise(1, 1000, {
   persistence: 0.01,

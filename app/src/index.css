@@ -15,8 +15,11 @@ a {
   cursor: pointer;
 }
 
+.Home{
+  padding-top: 300px;
+}
+
 input {
-  margin-top: 50px;
   display: block;
   margin: auto;
   margin-bottom: 50px;

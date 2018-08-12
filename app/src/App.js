@@ -66,6 +66,7 @@ class App extends Component {
       endTimestamp: new Date().getTime() + TICK_PERIOD,
       lerped: emptyTickState(),
       showInstructions: true,
+      winner: "Aaron",
     };
 
     this.mousePos = {};
@@ -75,11 +76,20 @@ class App extends Component {
     this.startLerp_();
     this.listenForTicks_();
     this.startMousePoll_();
+    this.listenForWinner_();
     if(props.nickname) this.sendNickname_(props.nickname);
   }
 
   sendNickname_(nickname){
     socket.emit('nickname', nickname);
+  }
+
+  listenForWinner_(){
+    socket.on('winner', (winner) => {
+      console.log("winner: " + winner);
+      this.setState(
+        Object.assign({}, this.state, {winner}));
+    });
   }
 
   listenForTicks_(){
@@ -220,6 +230,11 @@ class App extends Component {
             </p>
       </div>) : false;
 
+    const previousWinner = <div className="Winner">
+      Previous Winner: <span>
+      {this.state.winner}
+      </span></div>;
+
     return (
       <div className="Game" 
           tabIndex="0"
@@ -231,6 +246,7 @@ class App extends Component {
               balance={this.state.lerped.balance} 
               total={this.state.lerped.totalCurrency}/>
         </div>
+        {previousWinner}
         {maybeInstructions}
       </div>
     );
